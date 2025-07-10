@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="JSONPlaceholder API Test Suite">
+    <parameter name="baseUrl" value="https://jsonplaceholder.typicode.com"/>
+
+    <test name="Users API Tests">
+        <classes>
+            <class name="com.emmanuelarhu.tests.UsersTest"/>
+        </classes>
+    </test>
+
+    <test name="Posts API Tests">
+        <classes>
+            <class name="com.emmanuelarhu.tests.PostsTest"/>
+        </classes>
+    </test>
+
+    <test name="Comments API Tests">
+        <classes>
+            <class name="com.emmanuelarhu.tests.CommentsTest"/>
+        </classes>
+    </test>
+
+    <test name="Albums API Tests">
+        <classes>
+            <class name="com.emmanuelarhu.tests.AlbumsTest"/>
+        </classes>
+    </test>
+
+    <test name="Photos API Tests">
+        <classes>
+            <class name="com.emmanuelarhu.tests.PhotosTest"/>
+        </classes>
+    </test>
+
+    <test name="Todos API Tests">
+        <classes>
+            <class name="com.emmanuelarhu.tests.TodosTest"/>
+        </classes>
+    </test>
+</suite>
