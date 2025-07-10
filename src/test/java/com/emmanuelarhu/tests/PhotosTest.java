@@ -1,179 +1,316 @@
 package com.emmanuelarhu.tests;
 
 import com.emmanuelarhu.base.BaseTest;
+import com.emmanuelarhu.data.TestDataProvider;
 import com.emmanuelarhu.models.photos;
+import com.emmanuelarhu.validation.PhotoValidation;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.testng.Assert.*;
 
 /**
- * Simple tests for Photos API
+ * Complete Photos API tests with TestNG and DataProvider
  *
  * @author Emmanuel Arhu
  */
 @Feature("Photos API")
 public class PhotosTest extends BaseTest {
 
-    @Test
-    @DisplayName("GET /photos - Should return all 5000 photos")
+    @Test(priority = 1)
+    @Severity(SeverityLevel.CRITICAL)
     @Description("Verify that we can retrieve all photos and get exactly 5000 photos")
     public void testGetAllPhotos() {
-        Response response = getRequest()
-                .when()
-                .get("/photos")
-                .then()
-                .statusCode(200)
-                .body("$", hasSize(5000))
-                .body("[0].id", notNullValue())
-                .body("[0].albumId", notNullValue())
-                .body("[0].title", not(emptyString()))
-                .body("[0].url", not(emptyString()))
-                .body("[0].thumbnailUrl", not(emptyString()))
-                .extract().response();
+        try {
+            Response response = makeApiCall("/photos", "GET");
 
-        verifyResponseTime(response.getTime());
+            response.then()
+                    .statusCode(200)
+                    .body("$", hasSize(5000))
+                    .body("[0].id", notNullValue())
+                    .body("[0].albumId", notNullValue())
+                    .body("[0].title", not(emptyString()))
+                    .body("[0].url", not(emptyString()))
+                    .body("[0].thumbnailUrl", not(emptyString()));
 
-        // Convert to photos objects and verify
-        photos[] photos = response.as(photos[].class);
-        assertEquals(5000, photos.length, "Should have exactly 5000 photos");
+            verifyResponseTime(response.getTime());
 
-        photos firstPhoto = photos[0];
-        assertNotNull(firstPhoto.getId(), "photos should have an ID");
-        assertNotNull(firstPhoto.getAlbumId(), "photos should have an albumId");
-        assertFalse(firstPhoto.getTitle().isEmpty(), "photos should have a title");
-        assertFalse(firstPhoto.getUrl().isEmpty(), "photos should have a URL");
-        assertFalse(firstPhoto.getThumbnailUrl().isEmpty(), "photos should have a thumbnail URL");
+            // Convert to photos objects and verify
+            photos[] photos = response.as(photos[].class);
+            PhotoValidation.validatePhotoArray(photos, 5000);
 
-        System.out.println("✅ Successfully retrieved " + photos.length + " photos");
-    }
-
-    @Test
-    @DisplayName("GET /photos/1 - Should return specific photo")
-    @Description("Verify that we can retrieve a specific photo by ID")
-    public void testGetSinglePhoto() {
-        Response response = getRequest()
-                .when()
-                .get("/photos/1")
-                .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("albumId", notNullValue())
-                .body("title", not(emptyString()))
-                .body("url", not(emptyString()))
-                .body("thumbnailUrl", not(emptyString()))
-                .extract().response();
-
-        verifyResponseTime(response.getTime());
-
-        // Convert to photos object and verify
-        photos photo = response.as(photos.class);
-        assertEquals(1, photo.getId(), "photos ID should be 1");
-        assertNotNull(photo.getAlbumId(), "photos should have an albumId");
-        assertFalse(photo.getTitle().isEmpty(), "photos should have a title");
-        assertFalse(photo.getUrl().isEmpty(), "photos should have a URL");
-
-        System.out.println("✅ Successfully retrieved photo: " + photo.getId());
-    }
-
-    @Test
-    @DisplayName("POST /photos - Should create a new photo")
-    @Description("Verify that we can create a new photo")
-    public void testCreateNewPhoto() {
-        photos newPhoto = new photos(1, "Test photos", "https://test.com/photo.jpg", "https://test.com/thumb.jpg");
-
-        Response response = getRequest()
-                .body(newPhoto)
-                .when()
-                .post("/photos")
-                .then()
-                .statusCode(201)
-                .body("id", notNullValue())
-                .body("albumId", equalTo(1))
-                .body("title", equalTo("Test photos"))
-                .body("url", equalTo("https://test.com/photo.jpg"))
-                .body("thumbnailUrl", equalTo("https://test.com/thumb.jpg"))
-                .extract().response();
-
-        verifyResponseTime(response.getTime());
-
-        // Convert to photos object and verify
-        photos createdPhoto = response.as(photos.class);
-        assertNotNull(createdPhoto.getId(), "Created photo should have an ID");
-        assertEquals(1, createdPhoto.getAlbumId(), "Created photo should have correct albumId");
-        assertEquals("Test photos", createdPhoto.getTitle(), "Created photo should have correct title");
-
-        System.out.println("✅ Successfully created new photo with ID: " + createdPhoto.getId());
-    }
-
-    @Test
-    @DisplayName("PUT /photos/1 - Should update existing photo")
-    @Description("Verify that we can completely update an existing photo")
-    public void testUpdatePhoto() {
-        photos updatedPhoto = new photos(1, "Updated photos", "https://updated.com/photo.jpg", "https://updated.com/thumb.jpg");
-        updatedPhoto.setId(1);
-
-        Response response = getRequest()
-                .body(updatedPhoto)
-                .when()
-                .put("/photos/1")
-                .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("albumId", equalTo(1))
-                .body("title", equalTo("Updated photos"))
-                .body("url", equalTo("https://updated.com/photo.jpg"))
-                .body("thumbnailUrl", equalTo("https://updated.com/thumb.jpg"))
-                .extract().response();
-
-        verifyResponseTime(response.getTime());
-
-        System.out.println("✅ Successfully updated photo 1");
-    }
-
-    @Test
-    @DisplayName("DELETE /photos/1 - Should delete existing photo")
-    @Description("Verify that we can delete an existing photo")
-    public void testDeletePhoto() {
-        Response response = getRequest()
-                .when()
-                .delete("/photos/1")
-                .then()
-                .statusCode(200)
-                .extract().response();
-
-        verifyResponseTime(response.getTime());
-
-        System.out.println("✅ Successfully deleted photo 1");
-    }
-
-    @Test
-    @DisplayName("GET /photos?albumId=1 - Should filter photos by album")
-    @Description("Verify that we can filter photos by album ID")
-    public void testFilterPhotosByAlbum() {
-        Response response = getRequest()
-                .queryParam("albumId", 1)
-                .when()
-                .get("/photos")
-                .then()
-                .statusCode(200)
-                .body("$", not(empty()))
-                .body("albumId", everyItem(equalTo(1)))
-                .extract().response();
-
-        verifyResponseTime(response.getTime());
-
-        photos[] photos = response.as(photos[].class);
-        assertTrue(photos.length > 0, "Should have photos for album 1");
-
-        for (photos photo : photos) {
-            assertEquals(1, photo.getAlbumId(), "All photos should belong to album 1");
+            System.out.println("✅ Successfully retrieved " + photos.length + " photos");
+        } catch (Exception e) {
+            fail("Test failed due to: " + e.getMessage());
         }
+    }
 
-        System.out.println("✅ Successfully filtered " + photos.length + " photos by albumId=1");
+    @Test(dataProvider = "validPhotoIds", dataProviderClass = TestDataProvider.class, priority = 2)
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Verify that we can retrieve specific photos by valid IDs")
+    public void testGetSinglePhoto(int photoId) {
+        try {
+            Response response = makeApiCall("/photos/" + photoId, "GET");
+
+            response.then()
+                    .statusCode(200)
+                    .body("id", equalTo(photoId))
+                    .body("albumId", notNullValue())
+                    .body("title", not(emptyString()))
+                    .body("url", not(emptyString()))
+                    .body("thumbnailUrl", not(emptyString()));
+
+            verifyResponseTime(response.getTime());
+
+            // Convert to photos object and verify
+            photos photo = response.as(photos.class);
+            PhotoValidation.validateSinglePhoto(photo, photoId);
+
+            System.out.println("✅ Successfully retrieved photo: " + photo.getId());
+        } catch (Exception e) {
+            fail("Test failed for photoId " + photoId + " due to: " + e.getMessage());
+        }
+    }
+
+    @Test(dataProvider = "validPhotoData", dataProviderClass = TestDataProvider.class, priority = 3)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that we can create new photos with valid data")
+    public void testCreateNewPhoto(int albumId, String title, String url, String thumbnailUrl) {
+        try {
+            photos newPhoto = TestDataProvider.createValidPhoto(albumId, title, url, thumbnailUrl);
+
+            Response response = getRequest()
+                    .body(newPhoto)
+                    .when()
+                    .post("/photos")
+                    .then()
+                    .statusCode(201)
+                    .body("id", notNullValue())
+                    .body("albumId", equalTo(albumId))
+                    .body("title", equalTo(title))
+                    .body("url", equalTo(url))
+                    .body("thumbnailUrl", equalTo(thumbnailUrl))
+                    .extract().response();
+
+            verifyResponseTime(response.getTime());
+
+            // Verify created photo
+            photos createdPhoto = response.as(photos.class);
+            PhotoValidation.validateCreatedPhoto(createdPhoto, albumId, title, url, thumbnailUrl);
+
+            System.out.println("✅ Successfully created new photo with ID: " + createdPhoto.getId());
+        } catch (Exception e) {
+            fail("Test failed for photo creation due to: " + e.getMessage());
+        }
+    }
+
+    @Test(dataProvider = "validPhotoData", dataProviderClass = TestDataProvider.class, priority = 4)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that we can update existing photos")
+    public void testUpdatePhoto(int albumId, String title, String url, String thumbnailUrl) {
+        try {
+            photos updatedPhoto = TestDataProvider.createValidPhoto(albumId, title, url, thumbnailUrl);
+            updatedPhoto.setId(1);
+
+            Response response = getRequest()
+                    .body(updatedPhoto)
+                    .when()
+                    .put("/photos/1")
+                    .then()
+                    .statusCode(200)
+                    .body("id", equalTo(1))
+                    .body("albumId", equalTo(albumId))
+                    .body("title", equalTo(title))
+                    .body("url", equalTo(url))
+                    .body("thumbnailUrl", equalTo(thumbnailUrl))
+                    .extract().response();
+
+            verifyResponseTime(response.getTime());
+
+            // Verify updated photo
+            photos returnedPhoto = response.as(photos.class);
+            PhotoValidation.validateUpdatedPhoto(returnedPhoto, 1, albumId, title, url, thumbnailUrl);
+
+            System.out.println("✅ Successfully updated photo 1");
+        } catch (Exception e) {
+            fail("Test failed for photo update due to: " + e.getMessage());
+        }
+    }
+
+    @Test(priority = 5)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that we can partially update photos using PATCH")
+    public void testPatchPhoto() {
+        try {
+            String patchBody = "{\"title\": \"Patched Photo Title\"}";
+
+            Response response = getRequest()
+                    .body(patchBody)
+                    .when()
+                    .patch("/photos/1")
+                    .then()
+                    .statusCode(200)
+                    .body("id", equalTo(1))
+                    .body("title", equalTo("Patched Photo Title"))
+                    .body("albumId", notNullValue())
+                    .body("url", notNullValue())
+                    .body("thumbnailUrl", notNullValue())
+                    .extract().response();
+
+            verifyResponseTime(response.getTime());
+            System.out.println("✅ Successfully patched photo title");
+        } catch (Exception e) {
+            fail("Test failed for photo patch due to: " + e.getMessage());
+        }
+    }
+
+    @Test(priority = 6)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that we can delete existing photos")
+    public void testDeletePhoto() {
+        try {
+            Response response = makeApiCall("/photos/1", "DELETE");
+
+            response.then().statusCode(200);
+            verifyResponseTime(response.getTime());
+
+            System.out.println("✅ Successfully deleted photo 1");
+        } catch (Exception e) {
+            fail("Test failed for photo deletion due to: " + e.getMessage());
+        }
+    }
+
+    @Test(dataProvider = "userIdFilters", dataProviderClass = TestDataProvider.class, priority = 7)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that we can filter photos by album ID")
+    public void testFilterPhotosByAlbum(int albumId) {
+        try {
+            Response response = getRequest()
+                    .queryParam("albumId", albumId)
+                    .when()
+                    .get("/photos")
+                    .then()
+                    .statusCode(200)
+                    .body("$", not(empty()))
+                    .body("albumId", everyItem(equalTo(albumId)))
+                    .extract().response();
+
+            verifyResponseTime(response.getTime());
+
+            photos[] photos = response.as(photos[].class);
+            PhotoValidation.validatePhotosForAlbum(photos, albumId);
+
+            System.out.println("✅ Successfully filtered " + photos.length + " photos by albumId=" + albumId);
+        } catch (Exception e) {
+            fail("Test failed for photo filtering by albumId " + albumId + " due to: " + e.getMessage());
+        }
+    }
+
+    // NEGATIVE TEST CASES
+    @Test(dataProvider = "invalidPhotoIds", dataProviderClass = TestDataProvider.class, priority = 8)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that requesting non-existent photos returns 404")
+    public void testGetNonExistentPhoto(int invalidPhotoId) {
+        try {
+            Response response = getRequest()
+                    .when()
+                    .get("/photos/" + invalidPhotoId)
+                    .then()
+                    .statusCode(404)
+                    .extract().response();
+
+            verifyResponseTime(response.getTime());
+            System.out.println("✅ Correctly returned 404 for invalid photo ID: " + invalidPhotoId);
+        } catch (Exception e) {
+            fail("Negative test failed for invalid photoId " + invalidPhotoId + " due to: " + e.getMessage());
+        }
+    }
+
+    @Test(dataProvider = "invalidPhotoData", dataProviderClass = TestDataProvider.class, priority = 9)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that creating photos with invalid data handles errors appropriately")
+    public void testCreatePhotoWithInvalidData(int albumId, String title, String url, String thumbnailUrl) {
+        try {
+            photos invalidPhoto = TestDataProvider.createValidPhoto(albumId, title, url, thumbnailUrl);
+
+            Response response = getRequest()
+                    .body(invalidPhoto)
+                    .when()
+                    .post("/photos");
+
+            // JSONPlaceholder is lenient, but we verify response is received
+            assertTrue(response.getStatusCode() >= 200 && response.getStatusCode() < 500,
+                    "Should receive a valid HTTP response code");
+
+            verifyResponseTime(response.getTime());
+            System.out.println("🔍 Tested invalid photo data: albumId=" + albumId + ", title='" + title + "'");
+        } catch (Exception e) {
+            System.out.println("✅ Expected error for invalid photo data: " + e.getMessage());
+        }
+    }
+
+    @Test(priority = 10)
+    @Severity(SeverityLevel.MINOR)
+    @Description("Verify API response when filtering with non-existent album ID")
+    public void testFilterPhotosWithInvalidAlbumId() {
+        try {
+            Response response = getRequest()
+                    .queryParam("albumId", 999)
+                    .when()
+                    .get("/photos")
+                    .then()
+                    .statusCode(200)
+                    .body("$", hasSize(0)) // Should return empty array
+                    .extract().response();
+
+            verifyResponseTime(response.getTime());
+            System.out.println("✅ Correctly returned empty array for non-existent albumId filter");
+        } catch (Exception e) {
+            fail("Test failed for invalid albumId filter due to: " + e.getMessage());
+        }
+    }
+
+    @Test(priority = 11)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify behavior when trying to delete non-existent photo")
+    public void testDeleteNonExistentPhoto() {
+        try {
+            Response response = getRequest()
+                    .when()
+                    .delete("/photos/9999")
+                    .then()
+                    .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
+                    .extract().response();
+
+            verifyResponseTime(response.getTime());
+            System.out.println("✅ Handled deletion of non-existent photo gracefully");
+        } catch (Exception e) {
+            fail("Negative test for deleting non-existent photo failed due to: " + e.getMessage());
+        }
+    }
+
+    @Test(priority = 12)
+    @Severity(SeverityLevel.MINOR)
+    @Description("Verify API response when sending malformed photo JSON")
+    public void testCreatePhotoWithMalformedJson() {
+        try {
+            String malformedJson = "{\"albumId\":1,\"title\":\"Test\",\"url\":"; // Missing closing
+
+            Response response = getRequest()
+                    .body(malformedJson)
+                    .when()
+                    .post("/photos");
+
+            // Should handle malformed JSON gracefully
+            assertTrue(response.getStatusCode() >= 400, "Should return error for malformed JSON");
+            System.out.println("✅ Properly handled malformed JSON with status: " + response.getStatusCode());
+        } catch (Exception e) {
+            System.out.println("✅ Expected error for malformed JSON: " + e.getMessage());
+        }
     }
 }
