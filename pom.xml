@@ -7,21 +7,21 @@
 
     <groupId>com.emmanuelarhu</groupId>
     <artifactId>jsonplaceholder-api-testing</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
 
     <name>JSONPlaceholder API Testing</name>
-    <description>Simple API testing framework for JSONPlaceholder using REST Assured and JUnit 5</description>
+    <description>API testing framework for JSONPlaceholder using REST Assured and TestNG</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency Versions -->
         <rest-assured.version>5.5.5</rest-assured.version>
+        <testng.version>7.8.0</testng.version>
         <junit.version>5.11.1</junit.version>
-        <allure.version>2.28.0</allure.version>
+        <allure.version>2.24.0</allure.version>
         <jackson.version>2.15.2</jackson.version>
         <maven-surefire.version>3.2.5</maven-surefire.version>
         <aspectj.version>1.9.24</aspectj.version>
@@ -36,6 +36,13 @@
             <version>${rest-assured.version}</version>
         </dependency>
 
+        <!-- TestNG -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+        </dependency>
+
         <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -43,10 +50,10 @@
             <version>${junit.version}</version>
         </dependency>
 
-        <!-- Allure JUnit 5 -->
+        <!-- Allure TestNG -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit5</artifactId>
+            <artifactId>allure-testng</artifactId>
             <version>${allure.version}</version>
         </dependency>
 
@@ -70,6 +77,12 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -80,8 +93,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
 
@@ -91,23 +104,16 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire.version}</version>
                 <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>
-                    <systemProperties>
-                        <property>
-                            <name>allure.results.directory</name>
-                            <value>${project.build.directory}/allure-results</value>
-                        </property>
-                    </systemProperties>
+                    <systemPropertyVariables>
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                    </systemPropertyVariables>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjweaver</artifactId>
-                        <version>${aspectj.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
             <!-- Allure Maven Plugin -->
@@ -117,6 +123,7 @@
                 <version>2.12.0</version>
                 <configuration>
                     <reportVersion>${allure.version}</reportVersion>
+                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
                 </configuration>
             </plugin>
         </plugins>
