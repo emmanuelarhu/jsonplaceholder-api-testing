@@ -1,10 +1,13 @@
 package com.emmanuelarhu.models;
 
+import io.qameta.allure.internal.shadowed.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * todos model for JSONPlaceholder API
  *
  * @author Emmanuel Arhu
  */
+@JsonIgnoreProperties(ignoreUnknown = true)  // ✅ Add this line
 public class todos {
     private Integer id;
     private Integer userId;
