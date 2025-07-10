@@ -63,15 +63,24 @@ public class BaseTest {
      * Helper method to safely make API calls with retry logic
      */
     protected Response makeApiCall(String endpoint, String method) {
-        int maxRetries = 3;
+        int maxRetries = 3;  // ✅ Actually allow retries
         int retryCount = 0;
 
-        while (retryCount < maxRetries) {
+        while (retryCount <= maxRetries) {  // ✅ Fixed: <= instead of <
             try {
+                System.out.println("🔄 Attempt " + (retryCount + 1) + "/" + (maxRetries + 1) +
+                        " - " + method + " " + BASE_URL + endpoint);
+
                 Response response;
                 switch (method.toUpperCase()) {
                     case "GET":
                         response = getRequest().get(endpoint);
+                        break;
+                    case "POST":
+                        response = getRequest().post(endpoint);
+                        break;
+                    case "PUT":
+                        response = getRequest().put(endpoint);
                         break;
                     case "DELETE":
                         response = getRequest().delete(endpoint);
@@ -80,19 +89,28 @@ public class BaseTest {
                         throw new IllegalArgumentException("Unsupported method: " + method);
                 }
 
-                // If successful, return response
+                // ✅ Log response details for debugging
+                System.out.println("📊 Response Status: " + response.getStatusCode());
+                System.out.println("📊 Response Time: " + response.getTime() + "ms");
+                System.out.println("📊 Response Body Length: " + response.getBody().asString().length());
+
+                // ✅ Accept any non-server error status codes
                 if (response.getStatusCode() < 500) {
                     return response;
+                } else {
+                    System.out.println("❌ Server error " + response.getStatusCode() + ", retrying...");
                 }
 
             } catch (Exception e) {
-                System.out.println("❌ Attempt " + (retryCount + 1) + " failed: " + e.getMessage());
+                System.out.println("❌ Attempt " + (retryCount + 1) + " failed: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+                e.printStackTrace(); // ✅ Print full stack trace for debugging
             }
 
             retryCount++;
-            if (retryCount < maxRetries) {
+            if (retryCount <= maxRetries) {  // ✅ Fixed condition
                 try {
                     Thread.sleep(1000 * retryCount); // Exponential backoff
+                    System.out.println("⏳ Waiting " + (1000 * retryCount) + "ms before retry...");
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     break;
@@ -100,6 +118,6 @@ public class BaseTest {
             }
         }
 
-        throw new RuntimeException("Failed to make API call after " + maxRetries + " attempts");
+        throw new RuntimeException("Failed to make API call to " + endpoint + " after " + (maxRetries + 1) + " attempts");
     }
 }
