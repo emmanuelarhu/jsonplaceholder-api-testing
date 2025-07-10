@@ -1,0 +1,68 @@
+[
+  {
+    "name": "Performance Issues",
+    "description": "Tests that failed due to performance threshold violations",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*Performance threshold exceeded.*"
+  },
+  {
+    "name": "Security Violations",
+    "description": "Tests that detected security vulnerabilities",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*Security violation.*"
+  },
+  {
+    "name": "Configuration Errors",
+    "description": "Tests that failed due to configuration issues",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*Configuration Error.*"
+  },
+  {
+    "name": "Network Issues",
+    "description": "Tests that failed due to network connectivity problems",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(Connection.*timeout|ConnectException|UnknownHostException).*"
+  },
+  {
+    "name": "Data Validation Errors",
+    "description": "Tests that failed due to unexpected data format or content",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*Data validation failed.*"
+  },
+  {
+    "name": "JSON Schema Violations",
+    "description": "Tests that failed JSON schema validation",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*does not match the schema.*"
+  },
+  {
+    "name": "HTTP Status Code Issues",
+    "description": "Tests that received unexpected HTTP status codes",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*Expected status code.*but was.*"
+  },
+  {
+    "name": "Timeout Issues",
+    "description": "Tests that exceeded timeout limits",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(timeout|Timeout).*"
+  },
+  {
+    "name": "Authentication Issues",
+    "description": "Tests that failed due to authentication problems",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*(401|Unauthorized|Authentication).*"
+  },
+  {
+    "name": "Resource Not Found",
+    "description": "Tests that failed because resources were not found",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*(404|Not Found).*"
+  },
+  {
+    "name": "Flaky Tests",
+    "description": "Tests that are unstable and may fail intermittently",
+    "matchedStatuses": ["failed", "broken"],
+    "flaky": true
+  }
+]
