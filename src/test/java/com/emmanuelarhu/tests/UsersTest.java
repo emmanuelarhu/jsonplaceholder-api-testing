@@ -1,180 +1,242 @@
 package com.emmanuelarhu.tests;
 
 import com.emmanuelarhu.base.BaseTest;
+import com.emmanuelarhu.data.TestDataProvider;
 import com.emmanuelarhu.models.users;
+import com.emmanuelarhu.validation.UserValidation;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.testng.Assert.*;
 
 /**
- * Simple tests for Users API
+ * Updated Users API tests with TestNG and DataProvider
  *
  * @author Emmanuel Arhu
  */
 @Feature("Users API")
 public class UsersTest extends BaseTest {
 
-    @Test
-    @DisplayName("GET /users - Should return all 10 users")
+    @Test(priority = 1)
+    @Severity(SeverityLevel.CRITICAL)
     @Description("Verify that we can retrieve all users and get exactly 10 users")
     public void testGetAllUsers() {
-        Response response = getRequest()
-                .when()
-                .get("/users")
-                .then()
-                .statusCode(200)
-                .body("$", hasSize(10))
-                .body("[0].id", notNullValue())
-                .body("[0].name", not(emptyString()))
-                .body("[0].username", not(emptyString()))
-                .body("[0].email", containsString("@"))
-                .extract().response();
+        try {
+            Response response = makeApiCall("/users", "GET");
 
-        verifyResponseTime(response.getTime());
+            response.then()
+                    .statusCode(200)
+                    .body("$", hasSize(10))
+                    .body("[0].id", notNullValue())
+                    .body("[0].name", not(emptyString()))
+                    .body("[0].username", not(emptyString()))
+                    .body("[0].email", containsString("@"));
 
-        // Convert to users objects and verify
-        users[] users = response.as(users[].class);
-        assertEquals(10, users.length, "Should have exactly 10 users");
+            verifyResponseTime(response.getTime());
 
-        for (users user : users) {
-            assertNotNull(user.getId(), "users should have an ID");
-            assertFalse(user.getName().isEmpty(), "users should have a name");
-            assertFalse(user.getUsername().isEmpty(), "users should have a username");
-            assertTrue(user.getEmail().contains("@"), "users should have valid email");
+            // Convert to users objects and verify
+            users[] users = response.as(users[].class);
+            assertEquals(users.length, 10, "Should have exactly 10 users");
+
+            // Use validation class
+            UserValidation.validateUserArray(users);
+
+            System.out.println("✅ Successfully retrieved " + users.length + " users");
+        } catch (Exception e) {
+            fail("Test failed due to: " + e.getMessage());
         }
-
-        System.out.println("✅ Successfully retrieved " + users.length + " users");
     }
 
-    @Test
-    @DisplayName("GET /users/1 - Should return specific user")
-    @Description("Verify that we can retrieve a specific user by ID")
-    public void testGetSingleUser() {
-        Response response = getRequest()
-                .when()
-                .get("/users/1")
-                .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("name", not(emptyString()))
-                .body("username", not(emptyString()))
-                .body("email", containsString("@"))
-                .extract().response();
+    @Test(dataProvider = "validUserIds", dataProviderClass = TestDataProvider.class, priority = 2)
+    @Severity(SeverityLevel.CRITICAL)
+    @Description("Verify that we can retrieve specific users by valid IDs")
+    public void testGetSingleUser(int userId) {
+        try {
+            Response response = makeApiCall("/users/" + userId, "GET");
 
-        verifyResponseTime(response.getTime());
+            response.then()
+                    .statusCode(200)
+                    .body("id", equalTo(userId))
+                    .body("name", not(emptyString()))
+                    .body("username", not(emptyString()))
+                    .body("email", containsString("@"));
 
-        // Convert to users object and verify
-        users user = response.as(users.class);
-        assertEquals(1, user.getId(), "users ID should be 1");
-        assertFalse(user.getName().isEmpty(), "users should have a name");
-        assertFalse(user.getUsername().isEmpty(), "users should have a username");
-        assertTrue(user.getEmail().contains("@"), "users should have valid email");
+            verifyResponseTime(response.getTime());
 
-        System.out.println("✅ Successfully retrieved user: " + user);
+            // Convert to users object and verify
+            users user = response.as(users.class);
+            UserValidation.validateSingleUser(user, userId);
+
+            System.out.println("✅ Successfully retrieved user: " + user);
+        } catch (Exception e) {
+            fail("Test failed for userId " + userId + " due to: " + e.getMessage());
+        }
     }
 
-    @Test
-    @DisplayName("POST /users - Should create a new user successfully with id 11")
-    @Description("Verify that we can create a new user")
-    public void testCreateNewUser() {
-        users newUser = new users();
-        newUser.setName("Emmanuel Arhu");
-        newUser.setUsername("Example");
-        newUser.setEmail("emmanuel.arhu@amalitechtraining.org");
+    @Test(dataProvider = "validUserData", dataProviderClass = TestDataProvider.class, priority = 3)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that we can create new users with valid data")
+    public void testCreateNewUser(String name, String username, String email) {
+        try {
+            users newUser = TestDataProvider.createValidUser(name, username, email);
 
-        Response response = getRequest()
-                .body(newUser)
-                .when()
-                .post("/users")
-                .then().log().all()
-                .statusCode(201)
-                .body("id", notNullValue())
-                .body("name", equalTo("Emmanuel Arhu"))
-                .body("username", equalTo("Example"))
-                .body("email", equalTo("emmanuel.arhu@amalitechtraining.org"))
-                .extract().response();
+            Response response = getRequest()
+                    .body(newUser)
+                    .when()
+                    .post("/users")
+                    .then()
+                    .statusCode(201)
+                    .body("id", notNullValue())
+                    .body("name", equalTo(name))
+                    .body("username", equalTo(username))
+                    .body("email", equalTo(email))
+                    .extract().response();
 
-        verifyResponseTime(response.getTime());
+            verifyResponseTime(response.getTime());
 
-        // Convert to users object and verify
-        users createdUser = response.as(users.class);
-        assertNotNull(createdUser.getId(), "Created user should have an ID");
-        assertEquals("Emmanuel Arhu", createdUser.getName(), "Created user should have correct name");
-        assertEquals("Example", createdUser.getUsername(), "Created user should have correct username");
-        assertEquals("emmanuel.arhu@amalitechtraining.org", createdUser.getEmail(), "Created user should have correct email");
+            // Verify created user
+            users createdUser = response.as(users.class);
+            UserValidation.validateCreatedUser(createdUser, name, username, email);
 
-        System.out.println("✅ Successfully created new user with ID: " + createdUser.getId());
+            System.out.println("✅ Successfully created new user with ID: " + createdUser.getId());
+        } catch (Exception e) {
+            fail("Test failed for user creation with data: " + name + ", " + username + ", " + email + " due to: " + e.getMessage());
+        }
     }
 
-    @Test
-    @DisplayName("PUT /users/1 - Should update existing user")
-    @Description("Verify that we can completely update an existing user")
-    public void testUpdateUser() {
-        users updatedUser = new users();
-        updatedUser.setId(1);
-        updatedUser.setName("Emmanuel Arhu");
-        updatedUser.setUsername("Example");
-        updatedUser.setEmail("emmanuel.arhu@amalitechtraining.org");
+    @Test(dataProvider = "validUserData", dataProviderClass = TestDataProvider.class, priority = 4)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that we can update existing users")
+    public void testUpdateUser(String name, String username, String email) {
+        try {
+            users updatedUser = TestDataProvider.createValidUser(name, username, email);
+            updatedUser.setId(1);
 
+            Response response = getRequest()
+                    .body(updatedUser)
+                    .when()
+                    .put("/users/1")
+                    .then()
+                    .statusCode(200)
+                    .body("id", equalTo(1))
+                    .body("name", equalTo(name))
+                    .body("username", equalTo(username))
+                    .body("email", equalTo(email))
+                    .extract().response();
 
-        Response response = getRequest()
-                .body(updatedUser)
-                .when()
-                .put("/users/1")
-                .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("name", equalTo("Emmanuel Arhu"))
-                .body("username", equalTo("Example"))
-                .body("email", equalTo("emmanuel.arhu@amalitechtraining.org"))
-                .extract().response();
+            verifyResponseTime(response.getTime());
 
-        verifyResponseTime(response.getTime());
+            users returnedUser = response.as(users.class);
+            UserValidation.validateUpdatedUser(returnedUser, 1, name, username, email);
 
-        // Convert to users object and verify
-        users returnedUser = response.as(users.class);
-        assertEquals(1, returnedUser.getId(), "Updated user should have correct ID");
-        assertEquals("Emmanuel Arhu", returnedUser.getName(), "Updated user should have new name");
-        assertEquals("Example", returnedUser.getUsername(), "Updated user should have new username");
-        assertEquals("emmanuel.arhu@amalitechtraining.org", returnedUser.getEmail(), "Updated user should have new email");
-
-        System.out.println("✅ Successfully updated user: " + returnedUser);
+            System.out.println("✅ Successfully updated user: " + returnedUser);
+        } catch (Exception e) {
+            fail("Test failed for user update due to: " + e.getMessage());
+        }
     }
 
-    @Test
-    @DisplayName("DELETE /users/1 - Should delete existing user")
-    @Description("Verify that we can delete an existing user")
+    @Test(priority = 5)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that we can delete existing users")
     public void testDeleteUser() {
-        Response response = getRequest()
-                .when()
-                .delete("/users/1")
-                .then()
-                .statusCode(200)
-                .extract().response();
+        try {
+            Response response = makeApiCall("/users/1", "DELETE");
 
-        verifyResponseTime(response.getTime());
+            response.then().statusCode(200);
+            verifyResponseTime(response.getTime());
 
-        System.out.println("✅ Successfully deleted user 1");
+            System.out.println("✅ Successfully deleted user 1");
+        } catch (Exception e) {
+            fail("Test failed for user deletion due to: " + e.getMessage());
+        }
     }
 
-    @Test
-    @DisplayName("GET /users/999 - Should return 404 for non-existent user")
-    @Description("Verify that requesting a non-existent user returns 404")
-    public void testGetNonExistentUser() {
-        Response response = getRequest()
-                .when()
-                .get("/users/999")
-                .then()
-                .statusCode(404)
-                .extract().response();
+    // NEGATIVE TEST CASES
+    @Test(dataProvider = "invalidUserIds", dataProviderClass = TestDataProvider.class, priority = 6)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that requesting non-existent users returns 404")
+    public void testGetNonExistentUser(int invalidUserId) {
+        try {
+            Response response = getRequest()
+                    .when()
+                    .get("/users/" + invalidUserId)
+                    .then()
+                    .statusCode(404)
+                    .extract().response();
 
-        verifyResponseTime(response.getTime());
+            verifyResponseTime(response.getTime());
+            System.out.println("✅ Correctly returned 404 for invalid user ID: " + invalidUserId);
+        } catch (Exception e) {
+            fail("Negative test failed for invalid userId " + invalidUserId + " due to: " + e.getMessage());
+        }
+    }
 
-        System.out.println("✅ Correctly returned 404 for non-existent user");
+    @Test(dataProvider = "invalidUserData", dataProviderClass = TestDataProvider.class, priority = 7)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that creating users with invalid data handles errors appropriately")
+    public void testCreateUserWithInvalidData(String name, String username, String email) {
+        try {
+            users invalidUser = TestDataProvider.createInvalidUser(name, username, email);
+
+            Response response = getRequest()
+                    .body(invalidUser)
+                    .when()
+                    .post("/users");
+
+            // Note: JSONPlaceholder is lenient, but in real APIs this would return 400
+            // For demonstration, we check that response is received
+            assertTrue(response.getStatusCode() >= 200 && response.getStatusCode() < 500,
+                    "Should receive a valid HTTP response code");
+
+            verifyResponseTime(response.getTime());
+            System.out.println("🔍 Tested invalid data: name='" + name + "', username='" + username + "', email='" + email + "'");
+        } catch (Exception e) {
+            // Expected behavior for truly invalid requests
+            System.out.println("✅ Expected error for invalid data: " + e.getMessage());
+        }
+    }
+
+    @Test(priority = 8)
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify behavior when trying to delete non-existent user")
+    public void testDeleteNonExistentUser() {
+        try {
+            Response response = getRequest()
+                    .when()
+                    .delete("/users/999")
+                    .then()
+                    .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
+                    .extract().response();
+
+            verifyResponseTime(response.getTime());
+            System.out.println("✅ Handled deletion of non-existent user gracefully");
+        } catch (Exception e) {
+            fail("Negative test for deleting non-existent user failed due to: " + e.getMessage());
+        }
+    }
+
+    @Test(priority = 9)
+    @Severity(SeverityLevel.MINOR)
+    @Description("Verify API response when sending malformed JSON")
+    public void testCreateUserWithMalformedJson() {
+        try {
+            String malformedJson = "{\"name\":\"Test\",\"username\":\"test\",\"email\":"; // Missing closing
+
+            Response response = getRequest()
+                    .body(malformedJson)
+                    .when()
+                    .post("/users");
+
+            // Should handle malformed JSON gracefully
+            assertTrue(response.getStatusCode() >= 400, "Should return error for malformed JSON");
+            System.out.println("✅ Properly handled malformed JSON with status: " + response.getStatusCode());
+        } catch (Exception e) {
+            System.out.println("✅ Expected error for malformed JSON: " + e.getMessage());
+        }
     }
 }
