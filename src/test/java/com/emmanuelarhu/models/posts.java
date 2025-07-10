@@ -1,8 +1,11 @@
 package com.emmanuelarhu.models;
 
+import io.qameta.allure.internal.shadowed.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Simple posts model for JSONPlaceholder
  */
+@JsonIgnoreProperties(ignoreUnknown = true)  // ✅ Add this line
 public class posts {
     private Integer id;
     private Integer userId;
