@@ -88,4 +88,6 @@ public class UserValidation {
             assertTrue(userId >= 1 && userId <= 10, "User ID should be between 1 and 10 for JSONPlaceholder");
         }
     }
+
+
 }
