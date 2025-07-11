@@ -260,11 +260,11 @@ public class PhotosTest extends BaseTest {
     public void testFilterPhotosWithInvalidAlbumId() {
         try {
             Response response = getRequest()
-                    .queryParam("albumId", 999)
+                    .queryParam("albumId", 9999)
                     .when().log().all()
                     .get("/photos")
                     .then()
-                    .statusCode(200)
+                    .statusCode(404)
                     .body("$", hasSize(0)) // Should return empty array
                     .extract().response();
 
@@ -284,7 +284,7 @@ public class PhotosTest extends BaseTest {
                     .when().log().all()
                     .delete("/photos/9999")
                     .then()
-                    .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
+                    .statusCode(404) // JSONPlaceholder returns 200 even for non-existent resources
                     .extract().response();
 
             verifyResponseTime(response.getTime());
