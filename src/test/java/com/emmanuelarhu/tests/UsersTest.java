@@ -190,7 +190,7 @@ public class UsersTest extends BaseTest {
 
             // Note: JSONPlaceholder is lenient, but in real APIs this would return 400
             // For demonstration, we check that response is received
-            assertTrue(response.getStatusCode() >= 200 && response.getStatusCode() < 500,
+            assertTrue(response.getStatusCode() == 404,
                     "Should receive a valid HTTP response code");
 
             verifyResponseTime(response.getTime());
