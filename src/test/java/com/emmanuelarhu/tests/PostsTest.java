@@ -282,7 +282,7 @@ public class PostsTest extends BaseTest {
                     .post("/posts");
 
             // JSONPlaceholder is lenient, but we verify response is received
-            assertTrue(response.getStatusCode() >= 200 && response.getStatusCode() < 500,
+            assertTrue(response.getStatusCode() == 404,
                     "Should receive a valid HTTP response code");
 
             verifyResponseTime(response.getTime());
@@ -301,7 +301,7 @@ public class PostsTest extends BaseTest {
                     .when().log().all()
                     .delete("/posts/999")
                     .then()
-                    .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
+                    .statusCode(404) // JSONPlaceholder returns 200 even for non-existent resources
                     .extract().response();
 
             verifyResponseTime(response.getTime());
