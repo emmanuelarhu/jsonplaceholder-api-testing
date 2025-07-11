@@ -86,7 +86,7 @@ public class PhotosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(newPhoto)
-                    .when()
+                    .when().log().all()
                     .post("/photos")
                     .then()
                     .statusCode(201)
@@ -119,7 +119,7 @@ public class PhotosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(updatedPhoto)
-                    .when()
+                    .when().log().all()
                     .put("/photos/1")
                     .then()
                     .statusCode(200)
@@ -151,7 +151,7 @@ public class PhotosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(patchBody)
-                    .when()
+                    .when().log().all()
                     .patch("/photos/1")
                     .then()
                     .statusCode(200)
@@ -192,7 +192,7 @@ public class PhotosTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("albumId", albumId)
-                    .when()
+                    .when().log().all()
                     .get("/photos")
                     .then()
                     .statusCode(200)
@@ -218,7 +218,7 @@ public class PhotosTest extends BaseTest {
     public void testGetNonExistentPhoto(int invalidPhotoId) {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .get("/photos/" + invalidPhotoId)
                     .then()
                     .statusCode(404)
@@ -240,7 +240,7 @@ public class PhotosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(invalidPhoto)
-                    .when()
+                    .when().log().all()
                     .post("/photos");
 
             // JSONPlaceholder is lenient, but we verify response is received
@@ -261,7 +261,7 @@ public class PhotosTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("albumId", 999)
-                    .when()
+                    .when().log().all()
                     .get("/photos")
                     .then()
                     .statusCode(200)
@@ -281,7 +281,7 @@ public class PhotosTest extends BaseTest {
     public void testDeleteNonExistentPhoto() {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .delete("/photos/9999")
                     .then()
                     .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
@@ -303,7 +303,7 @@ public class PhotosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(malformedJson)
-                    .when()
+                    .when().log().all()
                     .post("/photos");
 
             // Should handle malformed JSON gracefully
