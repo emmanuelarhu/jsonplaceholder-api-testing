@@ -60,7 +60,7 @@ public class TestDataProvider {
     @DataProvider(name = "invalidPostData")
     public Object[][] invalidPostData() {
         return new Object[][]{
-                {0, 25, 52},              // Invalid userId
+                {0, "00", "52"},              // Invalid userId
                 {-1, "Test Post", "Test content"},             // Negative userId
                 {999, "Test Post", "Test content"},            // Non-existent userId
                 {1, "", "Test content"},                        // Empty title
