@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Failed suite [Surefire suite]" verbose="0">
+  <test thread-count="5" name="Surefire test(failed)" verbose="0">
+    <classes>
+      <class name="com.emmanuelarhu.tests.AlbumsTest">
+        <methods>
+          <include name="testCreateAlbumWithInvalidData" invocation-numbers="0"/>
+          <include name="testFilterAlbumsWithInvalidUserId"/>
+          <include name="testDeleteNonExistentAlbum"/>
+          <include name="setup"/>
+        </methods>
+      </class> <!-- com.emmanuelarhu.tests.AlbumsTest -->
+      <class name="com.emmanuelarhu.tests.TodosTest">
+        <methods>
+          <include name="testCreateTodoWithInvalidData"/>
+          <include name="testDeleteNonExistentTodo"/>
+          <include name="setup"/>
+          <include name="testFilterTodosWithInvalidUserId"/>
+        </methods>
+      </class> <!-- com.emmanuelarhu.tests.TodosTest -->
+      <class name="com.emmanuelarhu.tests.UsersTest">
+        <methods>
+          <include name="testCreateUserWithInvalidData" invocation-numbers="0 1 2 3 4 5 6"/>
+          <include name="setup"/>
+        </methods>
+      </class> <!-- com.emmanuelarhu.tests.UsersTest -->
+      <class name="com.emmanuelarhu.tests.CommentsTest">
+        <methods>
+          <include name="testCreateCommentWithInvalidData" invocation-numbers="0 1 2 3 4 5 6 7 8 9"/>
+          <include name="testFilterCommentsWithInvalidPostId"/>
+          <include name="setup"/>
+        </methods>
+      </class> <!-- com.emmanuelarhu.tests.CommentsTest -->
+      <class name="com.emmanuelarhu.tests.PostsTest">
+        <methods>
+          <include name="testCreatePostWithInvalidData" invocation-numbers="0 1 2 3 4 5 6"/>
+          <include name="testDeleteNonExistentPost"/>
+          <include name="setup"/>
+        </methods>
+      </class> <!-- com.emmanuelarhu.tests.PostsTest -->
+      <class name="com.emmanuelarhu.tests.PhotosTest">
+        <methods>
+          <include name="testFilterPhotosWithInvalidAlbumId"/>
+          <include name="testDeleteNonExistentPhoto"/>
+          <include name="setup"/>
+        </methods>
+      </class> <!-- com.emmanuelarhu.tests.PhotosTest -->
+    </classes>
+  </test> <!-- Surefire test(failed) -->
+</suite> <!-- Failed suite [Surefire suite] -->

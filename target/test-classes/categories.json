@@ -1,0 +1,38 @@
+[
+  {
+    "name": "API Connection Issues",
+    "description": "Tests failed due to network or API connectivity problems",
+    "messageRegex": ".*Connection.*|.*timeout.*|.*refused.*",
+    "traceRegex": ".*ConnectException.*|.*SocketTimeoutException.*|.*UnknownHostException.*"
+  },
+  {
+    "name": "HTTP Status Code Failures",
+    "description": "Tests failed due to unexpected HTTP status codes",
+    "messageRegex": ".*Expected status code.*|.*status.*",
+    "traceRegex": ".*AssertionError.*status.*"
+  },
+  {
+    "name": "JSON Response Issues",
+    "description": "Tests failed due to JSON parsing or structure problems",
+    "messageRegex": ".*JSON.*|.*parsing.*|.*body.*",
+    "traceRegex": ".*JsonException.*|.*JsonParseException.*"
+  },
+  {
+    "name": "Data Validation Failures",
+    "description": "Tests failed due to data validation issues",
+    "messageRegex": ".*validation.*|.*should.*|.*expected.*",
+    "traceRegex": ".*AssertionError.*"
+  },
+  {
+    "name": "Test Infrastructure Issues",
+    "description": "Tests failed due to test setup or infrastructure problems",
+    "messageRegex": ".*setup.*|.*configuration.*|.*initialization.*",
+    "traceRegex": ".*NullPointerException.*|.*IllegalStateException.*"
+  },
+  {
+    "name": "Negative Test Cases",
+    "description": "Expected failures from negative test scenarios",
+    "messageRegex": ".*negative.*|.*invalid.*|.*non-existent.*",
+    "traceRegex": ""
+  }
+]
