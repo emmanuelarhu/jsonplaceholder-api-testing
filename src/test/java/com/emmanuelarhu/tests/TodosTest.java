@@ -84,7 +84,7 @@ public class TodosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(newTodo)
-                    .when()
+                    .when().log().all()
                     .post("/todos")
                     .then()
                     .statusCode(201)
@@ -116,7 +116,7 @@ public class TodosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(updatedTodo)
-                    .when()
+                    .when().log().all()
                     .put("/todos/1")
                     .then()
                     .statusCode(200)
@@ -147,7 +147,7 @@ public class TodosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(patchBody)
-                    .when()
+                    .when().log().all()
                     .patch("/todos/1")
                     .then()
                     .statusCode(200)
@@ -192,7 +192,7 @@ public class TodosTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("completed", completed)
-                    .when()
+                    .when().log().all()
                     .get("/todos")
                     .then()
                     .statusCode(200)
@@ -218,7 +218,7 @@ public class TodosTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("userId", userId)
-                    .when()
+                    .when().log().all()
                     .get("/todos")
                     .then()
                     .statusCode(200)
@@ -244,7 +244,7 @@ public class TodosTest extends BaseTest {
     public void testGetNonExistentTodo(int invalidTodoId) {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .get("/todos/" + invalidTodoId)
                     .then()
                     .statusCode(404)
@@ -266,7 +266,7 @@ public class TodosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(invalidTodo)
-                    .when()
+                    .when().log().all()
                     .post("/todos");
 
             // JSONPlaceholder is lenient, but we verify response is received
@@ -287,7 +287,7 @@ public class TodosTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("userId", 999)
-                    .when()
+                    .when().log().all()
                     .get("/todos")
                     .then()
                     .statusCode(200)
@@ -307,7 +307,7 @@ public class TodosTest extends BaseTest {
     public void testDeleteNonExistentTodo() {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .delete("/todos/999")
                     .then()
                     .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
@@ -329,7 +329,7 @@ public class TodosTest extends BaseTest {
 
             Response response = getRequest()
                     .body(malformedJson)
-                    .when()
+                    .when().log().all()
                     .post("/todos");
 
             // Should handle malformed JSON gracefully
@@ -355,7 +355,7 @@ public class TodosTest extends BaseTest {
 
             Response patchResponse = getRequest()
                     .body(patchBody)
-                    .when()
+                    .when().log().all()
                     .patch("/todos/1")
                     .then()
                     .statusCode(200)
