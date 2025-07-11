@@ -212,8 +212,8 @@ public class CommentsTest extends BaseTest {
                     .post("/comments");
 
             // JSONPlaceholder is lenient, but we verify response is received
-            assertTrue(response.getStatusCode() >= 200 && response.getStatusCode() < 500,
-                    "Should receive a valid HTTP response code");
+            assertTrue(response.getStatusCode() == 200 ,
+                    "Expected 404 Not Found for invalid comment creation");
 
             verifyResponseTime(response.getTime());
             System.out.println("🔍 Tested invalid comment data: postId=" + postId + ", name='" + name + "'");
@@ -232,7 +232,7 @@ public class CommentsTest extends BaseTest {
                     .when().log().all()
                     .get("/comments")
                     .then()
-                    .statusCode(200)
+                    .statusCode(404)
                     .body("$", hasSize(0)) // Should return empty array
                     .extract().response();
 
