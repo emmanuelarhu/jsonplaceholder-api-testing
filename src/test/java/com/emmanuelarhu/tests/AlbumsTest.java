@@ -82,7 +82,7 @@ public class AlbumsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(newAlbum)
-                    .when()
+                    .when().log().all()
                     .post("/albums")
                     .then()
                     .statusCode(201)
@@ -113,7 +113,7 @@ public class AlbumsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(updatedAlbum)
-                    .when()
+                    .when().log().all()
                     .put("/albums/1")
                     .then()
                     .statusCode(200)
@@ -143,7 +143,7 @@ public class AlbumsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(patchBody)
-                    .when()
+                    .when().log().all()
                     .patch("/albums/1")
                     .then()
                     .statusCode(200)
@@ -182,7 +182,7 @@ public class AlbumsTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("userId", userId)
-                    .when()
+                    .when().log().all()
                     .get("/albums")
                     .then()
                     .statusCode(200)
@@ -208,7 +208,7 @@ public class AlbumsTest extends BaseTest {
     public void testGetNonExistentAlbum(int invalidAlbumId) {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .get("/albums/" + invalidAlbumId)
                     .then()
                     .statusCode(404)
@@ -230,7 +230,7 @@ public class AlbumsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(invalidAlbum)
-                    .when()
+                    .when().log().all()
                     .post("/albums");
 
             // JSONPlaceholder is lenient, but we verify response is received
@@ -251,7 +251,7 @@ public class AlbumsTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("userId", 999)
-                    .when()
+                    .when().log().all()
                     .get("/albums")
                     .then()
                     .statusCode(200)
@@ -271,7 +271,7 @@ public class AlbumsTest extends BaseTest {
     public void testDeleteNonExistentAlbum() {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .delete("/albums/999")
                     .then()
                     .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources

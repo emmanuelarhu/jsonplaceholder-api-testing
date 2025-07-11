@@ -87,7 +87,7 @@ public class UsersTest extends BaseTest {
 
             Response response = getRequest()
                     .body(newUser)
-                    .when()
+                    .when().log().all()
                     .post("/users")
                     .then()
                     .statusCode(201)
@@ -119,7 +119,7 @@ public class UsersTest extends BaseTest {
 
             Response response = getRequest()
                     .body(updatedUser)
-                    .when()
+                    .when().log().all()
                     .put("/users/1")
                     .then()
                     .statusCode(200)
@@ -163,7 +163,7 @@ public class UsersTest extends BaseTest {
     public void testGetNonExistentUser(int invalidUserId) {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .get("/users/" + invalidUserId)
                     .then()
                     .statusCode(404)
@@ -185,7 +185,7 @@ public class UsersTest extends BaseTest {
 
             Response response = getRequest()
                     .body(invalidUser)
-                    .when()
+                    .when().log().all()
                     .post("/users");
 
             // Note: JSONPlaceholder is lenient, but in real APIs this would return 400
@@ -207,7 +207,7 @@ public class UsersTest extends BaseTest {
     public void testDeleteNonExistentUser() {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .delete("/users/999")
                     .then()
                     .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
@@ -229,7 +229,7 @@ public class UsersTest extends BaseTest {
 
             Response response = getRequest()
                     .body(malformedJson)
-                    .when()
+                    .when().log().all()
                     .post("/users");
 
             // Should handle malformed JSON gracefully

@@ -1,6 +1,6 @@
 package com.emmanuelarhu.models;
 
-import io.qameta.allure.internal.shadowed.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * users model for JSONPlaceholder API

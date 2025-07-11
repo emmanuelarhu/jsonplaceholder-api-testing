@@ -113,7 +113,7 @@ public class PostsTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("postId", postId)
-                    .when()
+                    .when().log().all()
                     .get("/comments")
                     .then()
                     .statusCode(200)
@@ -142,7 +142,7 @@ public class PostsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(newPost)
-                    .when()
+                    .when().log().all()
                     .post("/posts")
                     .then()
                     .statusCode(201)
@@ -174,7 +174,7 @@ public class PostsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(updatedPost)
-                    .when()
+                    .when().log().all()
                     .put("/posts/1")
                     .then()
                     .statusCode(200)
@@ -208,7 +208,7 @@ public class PostsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(patchBody)
-                    .when()
+                    .when().log().all()
                     .patch("/posts/1")
                     .then()
                     .statusCode(200)
@@ -256,7 +256,7 @@ public class PostsTest extends BaseTest {
     public void testGetNonExistentPost(int invalidPostId) {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .get("/posts/" + invalidPostId)
                     .then()
                     .statusCode(404)
@@ -278,7 +278,7 @@ public class PostsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(invalidPost)
-                    .when()
+                    .when().log().all().log().all()
                     .post("/posts");
 
             // JSONPlaceholder is lenient, but we verify response is received
@@ -298,7 +298,7 @@ public class PostsTest extends BaseTest {
     public void testDeleteNonExistentPost() {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .delete("/posts/999")
                     .then()
                     .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
@@ -320,7 +320,7 @@ public class PostsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(malformedJson)
-                    .when()
+                    .when().log().all()
                     .post("/posts");
 
             // Should handle malformed JSON gracefully

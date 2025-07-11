@@ -86,7 +86,7 @@ public class CommentsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(newComment)
-                    .when()
+                    .when().log().all()
                     .post("/comments")
                     .then()
                     .statusCode(201)
@@ -119,7 +119,7 @@ public class CommentsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(updatedComment)
-                    .when()
+                    .when().log().all()
                     .put("/comments/1")
                     .then()
                     .statusCode(200)
@@ -160,7 +160,7 @@ public class CommentsTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("postId", postId)
-                    .when()
+                    .when().log().all()
                     .get("/comments")
                     .then()
                     .statusCode(200)
@@ -186,7 +186,7 @@ public class CommentsTest extends BaseTest {
     public void testGetNonExistentComment(int invalidCommentId) {
         try {
             Response response = getRequest()
-                    .when()
+                    .when().log().all()
                     .get("/comments/" + invalidCommentId)
                     .then()
                     .statusCode(404)
@@ -208,7 +208,7 @@ public class CommentsTest extends BaseTest {
 
             Response response = getRequest()
                     .body(invalidComment)
-                    .when()
+                    .when().log().all()
                     .post("/comments");
 
             // JSONPlaceholder is lenient, but we verify response is received
@@ -229,7 +229,7 @@ public class CommentsTest extends BaseTest {
         try {
             Response response = getRequest()
                     .queryParam("postId", 999)
-                    .when()
+                    .when().log().all()
                     .get("/comments")
                     .then()
                     .statusCode(200)
