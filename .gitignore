@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 /.allure
 target/allure-results
+run-tests.bat
 
 ### IntelliJ IDEA ###
 /.idea/
