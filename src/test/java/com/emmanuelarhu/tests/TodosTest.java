@@ -290,7 +290,7 @@ public class TodosTest extends BaseTest {
                     .when().log().all()
                     .get("/todos")
                     .then()
-                    .statusCode(200)
+                    .statusCode(404)
                     .body("$", hasSize(0)) // Should return empty array
                     .extract().response();
 
@@ -310,7 +310,7 @@ public class TodosTest extends BaseTest {
                     .when().log().all()
                     .delete("/todos/999")
                     .then()
-                    .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
+                    .statusCode(404) // JSONPlaceholder returns 200 even for non-existent resources
                     .extract().response();
 
             verifyResponseTime(response.getTime());

@@ -234,7 +234,7 @@ public class AlbumsTest extends BaseTest {
                     .post("/albums");
 
             // JSONPlaceholder is lenient, but we verify response is received
-            assertTrue(response.getStatusCode() >= 200 && response.getStatusCode() < 500,
+            assertTrue(response.getStatusCode() == 404 ,
                     "Should receive a valid HTTP response code");
 
             verifyResponseTime(response.getTime());
@@ -254,7 +254,7 @@ public class AlbumsTest extends BaseTest {
                     .when().log().all()
                     .get("/albums")
                     .then()
-                    .statusCode(200)
+                    .statusCode(404)
                     .body("$", hasSize(0)) // Should return empty array
                     .extract().response();
 
@@ -274,7 +274,7 @@ public class AlbumsTest extends BaseTest {
                     .when().log().all()
                     .delete("/albums/999")
                     .then()
-                    .statusCode(200) // JSONPlaceholder returns 200 even for non-existent resources
+                    .statusCode(404) // JSONPlaceholder returns 200 even for non-existent resources
                     .extract().response();
 
             verifyResponseTime(response.getTime());

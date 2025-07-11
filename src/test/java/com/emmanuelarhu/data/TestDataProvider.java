@@ -138,6 +138,8 @@ public class TestDataProvider {
     public Object[][] invalidAlbumData() {
         return new Object[][]{
                 {0, "Test Album"},          // Invalid userId
+                {"",""},
+                {null,null},
                 {-1, "Test Album"},         // Negative userId
                 {999, "Test Album"},        // Non-existent userId
                 {1, ""},                    // Empty title
